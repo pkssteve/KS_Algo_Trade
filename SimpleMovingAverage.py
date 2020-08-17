@@ -1,43 +1,31 @@
-import pandas_datareader as web
+import pandas_datareader as pd
 import datetime
 import pandas
 import matplotlib.pyplot as plt
+from pandas import DataFrame
 from zipline.api import order, record, symbol
 from zipline.algorithm import TradingAlgorithm
+import CalcIndicator as ci
 from zipline.api import set_commission
 
 # getting raw data
 start = datetime.datetime(2014, 1, 1)
 end = datetime.datetime(2016, 3, 29)
-data = web.DataReader('AAPL', 'yahoo', start, end)
+data = pd.DataReader('AAPL', 'yahoo', start, end)
 
 # modify raw data for use
-data = data[['Adj Close']]
-data.columns = ['AAPL']
+#data = data[['Adj Close']]
+#data.columns = ['AAPL']
+data.rename(columns = {'Adj Close' : 'AAPL'}, inplace = True)
 data = data.tz_localize('UTC')
+print(data.head())
 
-data.head()
 fig = plt.figure()
 ax1 = fig.add_subplot(2, 1, 1)
 ax2 = fig.add_subplot(2, 1, 2)
 
 # plt.plot(data.index, data['AAPL'])
 # plt.show()
-
-def getRSI(data):
-    iter = 0
-    AU=0
-    AD=0
-    for curPrice in data.values:
-        if iter > 0:
-            if data.values[iter - 1] < curPrice:
-                AU = AU + (curPrice - data.values[iter - 1])
-            elif data.values[iter - 1] > curPrice:
-                AD = AD + (data.values[iter - 1] - curPrice)
-
-        iter = iter + 1
-    return AU / (AD + AU)
-
 
 def initialize(context):
     context.i = 0
@@ -58,8 +46,8 @@ def handle_data(context, data):
     ma20 = data.history(context.sym, 'price', 20, '1d').mean()
     templist = data.history(context.sym, 'price', 15, '1d')
 
-    pre_rsi = getRSI(templist[0:-1])
-    rsi = getRSI(templist[1:])
+    pre_rsi = ci.getRSI(templist[0:-1])
+    rsi = ci.getRSI(templist[1:])
 
     if ma5 > ma20 and context.hold is False:
         order(context.sym, 100)
