@@ -86,6 +86,6 @@ ax1.plot(result.ix[result.buy == True].index, result.ma5[result.buy == True], '^
 ax1.plot(result.ix[result.sell == True].index, result.ma5[result.sell == True], 'v')
 
 ax2.plot(result.index, result.portfolio_value)
-print(result[['starting_cash', 'ending_cash', 'ending_value']].head())
+print(result[['starting_cash', 'ending_cash', 'ending_value']])
 plt.show()
 # result['portfolio_value'].plot()
