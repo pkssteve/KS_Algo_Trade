@@ -21,6 +21,7 @@ from zipline.finance import commission, slippage
 
 def initialize(context):
     context.asset = symbol('AAPL')
+    context.i=0
 
     # Explicitly set the commission/slippage to the "old" value until we can
     # rebuild example data.
@@ -34,6 +35,12 @@ def initialize(context):
 
 
 def handle_data(context, data):
+    context.i += 1
+    if context.i < 20:
+        return
+
+
+
     order(context.asset, 10)
     record(AAPL=data.current(context.asset, 'price'))
 
@@ -69,5 +76,5 @@ startdt = pd.Timestamp('2016-01-01', tz='utc')
 enddt = pd.Timestamp('2018-01-01', tz='utc')
 
 result = zipline.run_algorithm(start=startdt, end=enddt, initialize=initialize, capital_base=1000,
-                                handle_data=handle_data)
+                                handle_data=handle_data,data_frequency='minute')
 analyze(None, result)
