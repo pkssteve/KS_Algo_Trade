@@ -16,9 +16,9 @@ end = datetime.datetime(2016, 3, 29)
 data = pd.DataReader('AAPL', 'yahoo', start, end)
 
 # modify raw data for use
-#data = data[['Adj Close']]
-#data.columns = ['AAPL']
-data.rename(columns = {'Adj Close' : 'AAPL'}, inplace = True)
+data = data[['Adj Close']]
+data.columns = ['AAPL']
+# data.rename(columns = {'Adj Close' : 'AAPL'}, inplace = True)
 data = data.tz_localize('UTC')
 print(data.head())
 
@@ -34,7 +34,8 @@ def initialize(context):
     context.sym = symbol('AAPL')
     context.hold = False
     # set_commission(commission.PerDollar(cost=0.00165))
-
+    zipline.api.set_benchmark(symbol('AAPL'))
+    context.sid = symbol('AAPL')
 
 def handle_data(context, data):
     context.i += 1
@@ -64,7 +65,7 @@ def handle_data(context, data):
 
 
 result = zipline.run_algorithm(start=data.index[0], end=data.index[-1], initialize=initialize, capital_base=1000,
-                               handle_data=handle_data, data=data)
+                               handle_data=handle_data)
 
 # algo = TradingAlgorithm(initialize=initialize, handle_data=handle_data)
 # result = algo.run(data)
